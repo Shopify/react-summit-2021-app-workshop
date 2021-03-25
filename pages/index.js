@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { EmptyState, Layout, Page, Card } from "@shopify/polaris";
+import { EmptyState, Layout, Page, Card, DataTable } from "@shopify/polaris";
 import { ResourcePicker } from "@shopify/app-bridge-react";
 
 const img = "https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg";
@@ -13,7 +13,14 @@ const Index = () => {
     [isProductPickerOpen]
   );
   const handleSelectProducts = useCallback(
-    (selectionPayload) => setSelectedProducts(selectionPayload.selection),
+    (selectionPayload) =>
+      setSelectedProducts(
+        selectionPayload.selection.map((product) => {
+          console.log(product);
+
+          return [product.title, product.status];
+        })
+      ),
     [selectedProducts]
   );
 
@@ -44,11 +51,11 @@ const Index = () => {
       title="Default discount"
       description="Add a product to Sample App, it will automatically be discounted."
     >
-      <Card sectioned>
-        {selectedProducts.map((product, i) => (
-          <div key={i}>{product.title}</div>
-        ))}
-      </Card>
+      <DataTable
+        columnContentTypes={["text", "text"]}
+        headings={["Product", "Status"]}
+        rows={selectedProducts}
+      />
     </Layout.AnnotatedSection>
   );
 
