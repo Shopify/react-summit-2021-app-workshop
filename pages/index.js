@@ -1,8 +1,9 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { EmptyState, Layout, Page, Card, DataTable } from "@shopify/polaris";
+import React, { useState, useCallback } from "react";
+import { EmptyState, List, Page, Card } from "@shopify/polaris";
 import { ResourcePicker } from "@shopify/app-bridge-react";
 
-const img = "https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg";
+const img =
+  "https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png";
 
 const Index = () => {
   const [isProductPickerOpen, setProductPickerOpen] = useState(false);
@@ -16,25 +17,25 @@ const Index = () => {
     (selectionPayload) =>
       setSelectedProducts(
         selectionPayload.selection.map((product) => {
-          console.log(product);
+          console.log(product.id);
 
-          return [product.title, product.status];
+          return product.title;
         })
       ),
     [selectedProducts]
   );
 
   const emptyState = (
-    <>
+    <Card sectioned>
       <EmptyState
-        heading="Discount your products temporarily"
+        heading="Create a subscription box"
         action={{
           content: "Select products",
           onAction: handleOpenProductPicker(true),
         }}
         image={img}
       >
-        <p>Select products to change their price temporarily.</p>
+        <p>Select products to create a subscription plan.</p>
       </EmptyState>
 
       <ResourcePicker
@@ -43,27 +44,20 @@ const Index = () => {
         onSelection={handleSelectProducts}
         onCancel={handleOpenProductPicker(false)}
       />
-    </>
+    </Card>
   );
 
   const productList = (
-    <Layout.AnnotatedSection
-      title="Default discount"
-      description="Add a product to Sample App, it will automatically be discounted."
-    >
-      <DataTable
-        columnContentTypes={["text", "text"]}
-        headings={["Product", "Status"]}
-        rows={selectedProducts}
-      />
-    </Layout.AnnotatedSection>
+    <Card sectioned title="Create a box containing products">
+      <List type="bullet">
+        {selectedProducts.map((product) => (
+          <List.Item>{product}</List.Item>
+        ))}
+      </List>
+    </Card>
   );
 
-  return (
-    <Page>
-      <Layout>{selectedProducts.length ? productList : emptyState}</Layout>
-    </Page>
-  );
+  return <Page>{selectedProducts.length ? productList : emptyState}</Page>;
 };
 
 export default Index;
