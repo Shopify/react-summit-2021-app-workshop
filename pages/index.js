@@ -1,69 +1,54 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { EmptyState, Layout, Page, Card, DataTable } from "@shopify/polaris";
+import React, { useState } from "react";
+import { Page, Card, EmptyState, List } from "@shopify/polaris";
 import { ResourcePicker } from "@shopify/app-bridge-react";
 
-const img = "https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg";
+const img =
+  "https://raw.githubusercontent.com/Shopify/react-summit-2021-app-workshop/main/_extras/empty_state_apps.webp";
 
 const Index = () => {
   const [isProductPickerOpen, setProductPickerOpen] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
 
-  const handleOpenProductPicker = useCallback(
-    (openState) => () => setProductPickerOpen(openState),
-    [isProductPickerOpen]
-  );
-  const handleSelectProducts = useCallback(
-    (selectionPayload) =>
-      setSelectedProducts(
-        selectionPayload.selection.map((product) => {
-          console.log(product);
-
-          return [product.title, product.status];
-        })
-      ),
-    [selectedProducts]
-  );
-
   const emptyState = (
-    <>
+    <Card sectioned>
       <EmptyState
-        heading="Discount your products temporarily"
+        heading="Create a subscription box"
         action={{
           content: "Select products",
-          onAction: handleOpenProductPicker(true),
+          onAction: () => setProductPickerOpen(true),
         }}
         image={img}
       >
-        <p>Select products to change their price temporarily.</p>
+        <p>Select products to create a subscription plan.</p>
       </EmptyState>
 
       <ResourcePicker
         resourceType="Product"
         open={isProductPickerOpen}
-        onSelection={handleSelectProducts}
-        onCancel={handleOpenProductPicker(false)}
+        onSelection={(selectPayload) => {
+          const selected = selectPayload.selection.map((product) => {
+            return product.id;
+          });
+          console.log(selected);
+
+          setSelectedProducts(selected);
+        }}
+        onCancel={() => setProductPickerOpen(false)}
       />
-    </>
+    </Card>
   );
 
   const productList = (
-    <Layout.AnnotatedSection
-      title="Default discount"
-      description="Add a product to Sample App, it will automatically be discounted."
-    >
-      <DataTable
-        columnContentTypes={["text", "text"]}
-        headings={["Product", "Status"]}
-        rows={selectedProducts}
-      />
-    </Layout.AnnotatedSection>
+    <Card sectioned title="Create a box containing products">
+      <List type="bullet">
+        {selectedProducts.map((product) => (
+          <List.Item>{product}</List.Item>
+        ))}
+      </List>
+    </Card>
   );
 
-  return (
-    <Page>
-      <Layout>{selectedProducts.length ? productList : emptyState}</Layout>
-    </Page>
-  );
+  return <Page>{selectedProducts.length ? productList : emptyState}</Page>;
 };
 
 export default Index;
